@@ -17,7 +17,7 @@ app.use(express.json())
 
 //routes
 app.use("/hserver/medicine", require("./routes/medicineRoutes"))
-app.use("/hserver/users", require("./routes/userRoutes"))
+app.use("/hserver/auth", require("./routes/userRoutes"))
 app.use("/hserver/cart", require("./routes/cartRoutes"))
 
 //middleware
