@@ -1,12 +1,34 @@
 const asyncHandler = require("express-async-handler")
 const Medicine = require("../models/medicineModel")
+require("dotenv").config()
 
 //@desc get all medicine
 //@route GET /hserver/medicine
 //@access public
 
 const getMedicine = asyncHandler(async(req,res)=>{
-    const medicine = await Medicine.find()
+    const medicinename = req.query.medicinename
+    const pageSize = req.query.pageSize
+    const pagen = req.query.pagen
+    
+    var condition = medicinename 
+    ? {
+        Name:{ $regex: new RegExp(medicinename),$options: "i"},
+    }
+    : {};
+    
+    let perPage = Math.abs(pageSize) || process.env.PAGE_SIZE;
+    let page = (Math.abs(pagen) || 1) - 1;
+
+
+
+
+    const medicine = await Medicine
+    .find(condition)
+    .limit(perPage)
+    .skip(perPage * page)
+
+    console.log(pageSize)
     res.status(200).json({medicine})
 })
 
@@ -16,19 +38,6 @@ const getMedicine = asyncHandler(async(req,res)=>{
 
 const getMedicinebyid = asyncHandler(async(req,res)=>{
     const medicine = await Medicine.findById(req.params.id)
-    if(!medicine){
-        res.statusCode(404)
-        throw new Error("Medicine not found")
-    }
-    res.json({medicine})
-})
-
-//@desc get medicine by name
-//@route GET /hserver/medicine
-//@access public
-
-const getMedicinebyname = asyncHandler(async(req,res)=>{
-    const medicine = await Medicine.find({Name:req.params.name})
     if(!medicine){
         res.statusCode(404)
         throw new Error("Medicine not found")
@@ -108,4 +117,4 @@ const deleteMedicine = asyncHandler(async(req,res)=>{
 
 
 
-module.exports = {getMedicine, getMedicinebyid, getMedicinebyname, insertMedicine, editMedicine, deleteMedicine}
+module.exports = {getMedicine, getMedicinebyid,insertMedicine, editMedicine, deleteMedicine}
