@@ -1,3 +1,4 @@
+const { Int32 } = require("mongodb")
 const mongoose = require("mongoose")
 
 const medSchema = mongoose.Schema({
@@ -19,7 +20,7 @@ const medSchema = mongoose.Schema({
         required: [true,"Please add pack size label"]
     },
     Price:{
-        type: String,
+        type: Number,
         required: [true,"Please add price"]
     },
     Short_composition:{

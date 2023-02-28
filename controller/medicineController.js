@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler")
 const Medicine = require("../models/medicineModel")
 require("dotenv").config()
 
-//@desc get all medicine
+//@desc get all medicine, get medicine by name
 //@route GET /hserver/medicine
 //@access public
 
