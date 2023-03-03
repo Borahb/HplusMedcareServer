@@ -19,6 +19,7 @@ app.use(express.json())
 app.use("/hserver/medicine", require("./routes/medicineRoutes"))
 app.use("/hserver/auth", require("./routes/userRoutes"))
 app.use("/hserver/cart", require("./routes/cartRoutes"))
+app.use("/hserver/user", require("./routes/addressRoutes"))
 
 //middleware
 app.use(errorHandler)
