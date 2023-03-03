@@ -50,7 +50,7 @@ const addtoCart = asynchandler(async(req,res)=>{
 
                         cart.save(asyncDone)
                     }else{
-                        cart.products[itemIndex].qty = cart.products[itemIndex].qty + product.qty;
+                        cart.products[itemIndex].qty = product.qty;
                         cart.save(asyncDone)
                     }
                 });
@@ -91,41 +91,59 @@ const getCart = asynchandler(async(req,res)=>{
 //acess private
 
 const removeCartItem = asynchandler(async(req, res)=>{
-    const {productId, qty} = req.body
+    const {productId} = req.body
+    // console.log(productId)
+    // console.log(qty)
+    // Cart.findOne({user_id: req.user.user.id}, (err, cart)=>{
+    //     if(err){
+    //         throw new Error(err)
+    //     }else{
+    //         if(productId && qty){
+    //             if(cart.products.length === 0){
+    //                 res.json({"mess":"Cart Empty"})
+    //             }
+    //         }else{
+    //             let itemIndex = cart.products.findIndex(p=>p.product == productId);
+
+    //             if(itemIndex === -1){
+    //                 res.json({"mess":"Invalid Product"});
+    //             }
+    //             else{
+    //                 if(cart.products[itemIndex].qty === qty){
+    //                     cart.products.splice(itemIndex,1);
+    //                 }
+    //                 else if(cart.products[itemIndex].qty > qty){
+    //                     cart.products[itemIndex].qty = cart.products.qty - qty;
+    //                 }else{
+    //                     res.json({"mess":"Enter lower Qty"})
+    //                 }
+
+    //                 cart.save((err, res)=>{
+    //                     if(err) throw new Error(err)
+    //                     res.json({"mess":"Cart Updated"})
+    //                 })
+    //             }
+    //         }
+    //     }
+    // })
     console.log(productId)
-    console.log(qty)
-    Cart.findOne({user_id: req.user.user.id}, (err, cart)=>{
-        if(err){
-            throw new Error(err)
-        }else{
-            if(productId && qty){
-                if(cart.products.length === 0){
-                    res.json({"mess":"Cart Empty"})
-                }
-            }else{
-                let itemIndex = cart.products.findIndex(p=>p.product == productId);
-
-                if(itemIndex === -1){
-                    res.json({"mess":"Invalid Product"});
-                }
-                else{
-                    if(cart.products[itemIndex].qty === qty){
-                        cart.products.splice(itemIndex,1);
+    if(productId){
+        Cart.updateOne(
+            { user: req.user._id },
+            {
+                $pull:{
+                    products:{
+                        product:productId
                     }
-                    else if(cart.products[itemIndex].qty > qty){
-                        cart.products[itemIndex].qty = cart.products.qty - qty;
-                    }else{
-                        res.json({"mess":"Enter lower Qty"})
-                    }
-
-                    cart.save((err, res)=>{
-                        if(err) throw new Error(err)
-                        res.json({"mess":"Cart Updated"})
-                    })
                 }
             }
-        }
-    })
+        ).exec((error, result) => {
+            if (error) return res.status(400).json({ error });
+            if (result) {
+              res.status(202).json({ result });
+            }
+          });
+    }
 })
 
 
