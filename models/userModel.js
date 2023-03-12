@@ -19,6 +19,9 @@ const userSchema = mongoose.Schema({
         type:String,
         required:[true, "Please enter password"]
     },
+    stripeCustomerID:{
+        type:String,
+    },
     street: {
         type: String,
         default: ''

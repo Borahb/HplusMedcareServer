@@ -12,4 +12,10 @@ const dbconnect = async()=>{
     }
 }
 
-module.exports = dbconnect
+
+const STRIPE_CONFIG = {
+    STRIPE_KEY: "sk_test_51Mk7c1SEcS8URct2E6HPPCvCuQudtHfpkjObC9lyTBggyLGt18nciKEhSoxIaAc2BnvHRoAUXbTX969xQITLuLgw00cPTbCIX2",
+    CURRENCY:"inr"
+}
+
+module.exports = {dbconnect,STRIPE_CONFIG}
