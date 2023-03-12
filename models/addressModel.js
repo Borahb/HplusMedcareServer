@@ -73,5 +73,4 @@ const userAddressSchema = new mongoose.Schema(
 );
 
 mongoose.model("Address", addressSchema);
-
 module.exports = mongoose.model("UserAddress", userAddressSchema);
