@@ -4,162 +4,25 @@ const order = require("../models/orderModel")
 
 const stripeController = require("../controller/stripeController")
 const cart = require("../models/cartModel")
-
+const async = require("async")
 const asynchandler = require("express-async-handler")
 
 //@desc create order
 //@route POST /hserver/order/
 //@access private
-
-// const createOrder = asynchandler(async(req,res)=>{
-//     const {
-//         card_Name,
-//         card_Number,
-//         card_ExpMonth,
-//         card_ExpYear,
-//         card_CVC,
-//         amount
-//                         } = req.body
-//     user.findOne({_id:req.user.user.id}, async(err,userDB)=>{
-//         if(err){
-//             return res.json(err);
-//         }else{
-//             var model = {};
-
-//             if(!userDB.stripeCustomerID){
-//                 await stripeController.createCustomer({
-//                     "name": userDB.name,
-//                     "email":userDB.email
-//                 },(error,results)=>{
-//                     if(error){
-//                         return res.json(error);
-//                     }
-
-//                     if(results){
-//                         userDB.stripeCustomerID = results.id;
-//                         userDB.save()
-
-//                         model.stripeCustomerID = results.id
-//                     }
-//                 })
-//             }else{
-//                 model.stripeCustomerID = userDB.stripeCustomerID;
-//             }
-
-//             cards.findOne({
-//                 customerId: model.stripeCustomerID,
-//                 card_Number,
-//                 card_ExpMonth,
-//                 card_ExpYear
-//             },async(err, cardDB)=>{
-//                 if(err){
-//                     return res.json(err);
-//                 }else{
-//                     if(!cardDB){
-//                         await stripeController.addCard({
-//                             card_Name,
-//                             card_Number,
-//                             card_ExpMonth,
-//                             card_ExpYear,
-//                             card_CVC
-//                         },(err,results)=>{
-//                             if(err){
-//                                 res.send(err)
-//                             }
-
-//                             if(results){
-//                                 const cardModel = new cards({
-//                                     cardId : results.id,
-//                                     cardName: card_Name,
-//                                     cardNumber : card_Number,
-//                                     cardExpMonth: card_ExpMonth,
-//                                     cardExpYear : card_ExpYear,
-//                                     customerId: model.stripeCustomerID
-//                                 });
-
-//                                 cardModel.save()
-//                                 model.cardId = results.card;
-
-
-//                               }
-//                         })
-//                     }else{
-//                         model.cardId = cardDB.cardId;
-//                     }
-
-//                     await stripeController.generatePaymentIntent({
-//                         "receipt_email":userDB.email,
-//                         "amount": amount,
-//                         "card_id":model.cardId,
-//                         "customer_id": model.stripeCustomerID
-//                     },(err, results)=>{
-//                         if(err){
-//                             res.json(err)
-//                         }
-
-//                         if(results){
-//                             model.paymentIntentId = results.id;
-//                             model.client_secret = results.client_secret;
-//                         }
-//                     });
-
-//                     cartcontroller.getCart({user_id: userDB.id}, (err, cartDB)=>{
-//                         if(err){
-//                             return res.json(err); 
-//                         }else{
-//                             if(cartDB){
-//                                 var products = [];
-//                                 var garndTotal = 0;
-
-//                                 cartDB.products.forEach(product =>{
-//                                     products.push({
-//                                         product: product.product._id,
-//                                         qty: product.qty,
-//                                         amount: product.product.productSalePrice
-//                                     });
-
-//                                     garndTotal += product.product.productSalePrice;
-//                                 });
-
-//                                 const orderModel = new order({
-//                                     userId: cartDB.user_id,
-//                                     products: products,
-//                                     orderStatus:"pending",
-//                                     garndTotal:garndTotal
-//                                 });
-
-
-//                                 orderModel
-//                                 .save()
-//                                 .then((response)=>{
-//                                     model.orderId = response._id;
-//                                     return res.json({model})
-//                                 })
-//                                 .catch((error)=>{
-//                                     return res.json({error})
-//                                 })
-//                             }
-//                         }  
-//                     })
-//                 }
-//             })
-//         }
-//     })
-
-
-// })
-
-
 const createOrder = asynchandler(async(req,res)=>{
     const {shippingDetails} = req.body
-    user.findOne({_id:req.user.user.id},async(err,userDB)=>{
-        if(err){
-            throw new Error(err)
-        }else{   
-            var products = [];
-            var grandTotal = 0;
 
-            cart.findOne({user_id: req.user.user.id})
+    if(!shippingDetails){
+        res.status(400)
+        throw new Error("All fields are mandatory")
+    }
+
+    var products = [];
+    var grandTotal = 0;
+    var model = {};
+    
+    cart.findOne({user_id: req.user.user.id})
             .populate({
                 path:"products",
                 populate: {
@@ -170,39 +33,45 @@ const createOrder = asynchandler(async(req,res)=>{
     
         })
         .then((cartDB)=>{
-        //res.json({cartDB})
-        cartDB.products.forEach(product=>{
+            cartDB.products.forEach(product=>{
             products.push({
             product: product.product._id,
             qty: product.qty,
             amount: product.product.Price * product.qty
-        }) ;
-        
-        grandTotal += (product.product.Price * product.qty)
-        });
-
-        const orderModel = new order({
-            user_id: cartDB.user_id,
-            products: products,
-            orderStatus:"pending",
-            grandTotal: grandTotal,
-            shippingDetails:shippingDetails
-        });
-
-        orderModel
-        .save()
-        .then((response)=>{
-            res.json({response})
-        })
-        
-    })
-        .catch((err)=>{
-        throw new Error(err)
-        })
+            }) ;
             
+            grandTotal += (product.product.Price * product.qty)
+            });
+            model.products = products;
+            model.orderStatus = "pending";
+            model.grandTotal = grandTotal;
+            model.shippingDetails = shippingDetails;
+            //console.log(model)
+            //res.json({model})
 
-        }
-    })
+            order.findOneAndUpdate(
+                { user_id: req.user.user.id },
+                {
+                  $push: {
+                    orders:{
+                        products: products,
+                        orderStatus:"pending",
+                        grandTotal: grandTotal,
+                        shippingDetails:shippingDetails
+                    },
+                  },
+                },
+                { new: true, upsert: true }
+              ).exec((error, orders) => {
+                if (error) {
+                    throw new Error(error)};
+                if (orders) {
+                  res.status(201).json({ orders });
+                }
+              });
+
+        })
+
 })
 
 
@@ -219,8 +88,15 @@ const updateOrder = asynchandler(async(req,res)=>{
         transactionId: transaction_id
     }
 
-    order.findByIdAndUpdate(
-        _id, model, {useFindAndModify: false}
+    order.findOneAndUpdate(
+        { user_id: req.user.user.id, "orders._id" : _id }, 
+        {
+            $set: {
+                "orders.$.orderStatus":Status,
+                "orders.$.transactionId":transaction_id,
+            },
+          },
+          { new: true },
     ).then((response)=>{
         if(!response){
             res.send('Order update Failed')

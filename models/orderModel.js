@@ -63,36 +63,40 @@ const orderSchema = mongoose.Schema({
         type:String,
         required:true,
     },
-    products:[
-        {
-            product:{
-                type:mongoose.Schema.Types.ObjectId,
-                ref: "Medicine",
-                required:true,
-            },
-            amount:{
-                type: Number,
-                required:true,
-            },
-            qty:{
-                type:Number,
-                required:true
-            }
-        }
-    ],
-    grandTotal:{
-        type:Number,
-        required:true
-    },
-    shippingDetails: addressSchema,
-    orderStatus:{
-        type:String,
-        required: true,
-    },
-    transactionId:{
-        type:String,
-    }
-
+    orders :[
+      {
+        products:[
+          {
+              product:{
+                  type:mongoose.Schema.Types.ObjectId,
+                  ref: "Medicine",
+                  required:true,
+              },
+              amount:{
+                  type: Number,
+                  required:true,
+              },
+              qty:{
+                  type:Number,
+                  required:true
+              }
+          }
+      ],
+      grandTotal:{
+          type:Number,
+          required:true
+      },
+      shippingDetails: addressSchema,
+      orderStatus:{
+          type:String,
+          required: true,
+      },
+      transactionId:{
+          type:String,
+      }
+  
+      }
+    ]
 },
 {timestamps:true}
 )
