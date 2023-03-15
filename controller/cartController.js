@@ -126,7 +126,7 @@ const removeCartItem = asynchandler(async(req, res)=>{
     //         }
     //     }
     // })
-    console.log(productId)
+    //console.log(productId)
     if(productId){
         Cart.updateOne(
             { user: req.user._id },
