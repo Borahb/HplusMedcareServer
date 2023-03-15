@@ -20,7 +20,7 @@ const createOrder = asynchandler(async(req,res)=>{
 
     var products = [];
     var grandTotal = 0;
-    var model = {};
+    //var model = {};
     
     cart.findOne({user_id: req.user.user.id})
             .populate({
@@ -42,10 +42,6 @@ const createOrder = asynchandler(async(req,res)=>{
             
             grandTotal += (product.product.Price * product.qty)
             });
-            model.products = products;
-            model.orderStatus = "pending";
-            model.grandTotal = grandTotal;
-            model.shippingDetails = shippingDetails;
             //console.log(model)
             //res.json({model})
 
@@ -119,11 +115,16 @@ const updateOrder = asynchandler(async(req,res)=>{
 const getOrders = asynchandler((req,res)=>{
     order.findOne({user_id: req.user.user.id})
     .populate({
-        path:"products",
+        path:"orders",
         populate: {
-            path:"product",
-            model: "Medicine",
-            select: "Name Manufacturer_name Type Pack_size_label Price Short_composition Is_discontinued",
+            path:"products",
+            populate:{
+                path:"product",
+                model: "Medicine",
+                select: "Name Manufacturer_name Type Pack_size_label Price Short_composition Is_discontinued",
+            }
+
+            
         }   
     })
     .then((response)=>{
