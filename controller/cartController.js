@@ -40,57 +40,31 @@ const addtoCart = asynchandler(async(req,res)=>{
         throw new Error("UserId Required")
     }
 
-    Cart.findOne({user_id:req.user.user.id},(err, cart)=>{
-        if(err){
-            throw new Error(err)
-        }else{
-            if(cart == null){
-                const cartmodel = new Cart({
-                    user_id:req.user.user.id,
-                    products:products,
-                });
-
-                cartmodel
-                .save()
-                .then((response)=>{
-                    res.json({response})
-                })
-                .catch((err)=>{
-                    throw new Error(err)
-                })
-            }else if (cart.products.length == 0){
-                cart.products = products;
-                cart.save()
-                res.json({cart})
-            }else{
-                async.eachSeries(products,(product, asyncDone)=>{
-                    let itemIndex = cart.products.findIndex(p=>p.product == product.product);
-
-                    if(itemIndex === -1){
-                        cart.products.push({
-                            product: product.product,
-                            qty: product.qty
-                        });
-
-                        cart.save(asyncDone)
-                    }else{
-                        cart.products[itemIndex].qty = product.qty;
-                        cart.save(asyncDone)
-                    }
-                });
-
-                res.json({cart})
-            }
+    Cart.findOneAndUpdate(
+        { user_id: req.user.user.id },
+        {$push: {
+            products:products,
+          }
+        },
+        { new: true, upsert: true }
+      ).exec((error, orders) => {
+        if (error) {
+            throw new Error(error)};
+        if (orders) {
+          res.status(201).json({ orders });
         }
-    })
+      });
+
+    
     
 })
 
 //@desc get cart
-//@api POST hserver/medicine/cart
+//@api GET hserver/medicine/cart
 //acess private
 
 const getCart = asynchandler(async(req,res)=>{
+
     Cart.findOne({user_id: req.user.user.id})
     .populate({
         path:"products",
@@ -117,9 +91,9 @@ const getCart = asynchandler(async(req,res)=>{
 const removeCartItem = asynchandler(async(req, res)=>{
     const {productId} = req.body
     
-    //console.log(productId)
+    //console.log(req.user._id)
     if(productId){
-        Cart.updateOne(
+        Cart.findOneAndUpdate(
             { user: req.user._id },
             {
                 $pull:{
