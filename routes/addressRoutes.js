@@ -1,11 +1,12 @@
 const express = require("express");
-const {addAddress,getAddress} = require("../controller/addressController");
+const {addAddress,getAddress,initializeaddress} = require("../controller/addressController");
 const router = express.Router();
 const validateToken = require("../middleware/validateTokenHandler");
 
 
 router.use(validateToken)
 router.post('/address',addAddress)
+router.post('/initaddress',initializeaddress)
 router.get('/address',getAddress)
 
 module.exports = router;

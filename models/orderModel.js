@@ -1,62 +1,44 @@
 const mongoose = require("mongoose");
 
 const addressSchema = new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-      min: 3,
-      max: 50,
-    },
-    mobileNumber: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    pinCode: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    locality: {
-      type: String,
-      required: true,
-      trim: true,
-      min: 10,
-      max: 100,
-    },
-    address: {
-      type: String,
-      required: true,
-      trim: true,
-      min: 10,
-      max: 100,
-    },
-    cityDistrictTown: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    state: {
-      type: String,
-      required: true,
-      required: true,
-    },
-    landmark: {
-      type: String,
-      min: 10,
-      max: 100,
-    },
-    alternatePhone: {
-      type: String,
-    },
-    addressType: {
-      type: String,
-      required: true,
-      enum: ["home", "work"],
-      required: true,
-    },
-  });
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+    min: 3,
+    max: 50,
+  },
+  mobileNumber: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  pinCode: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  locality: {
+    type: String,
+    required: true,
+    trim: true,
+    min: 10,
+    max: 100,
+  },
+  address: {
+    type: String,
+    required: true,
+    trim: true,
+    min: 10,
+    max: 100,
+  },
+  addressType: {
+    type: String,
+    required: true,
+    enum: ["Home", "Work","Other"],
+    required: true,
+  },
+});
 
 const orderSchema = mongoose.Schema({
     user_id :{
@@ -87,14 +69,17 @@ const orderSchema = mongoose.Schema({
           required:true
       },
       shippingDetails: addressSchema,
+      paymentMode:{
+        type:String,
+        required: true,
+      },
       orderStatus:{
           type:String,
           required: true,
       },
       transactionId:{
           type:String,
-      }
-  
+      }  
       }
     ]
 },
