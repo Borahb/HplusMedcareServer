@@ -3,6 +3,30 @@ const async = require("async")
 const Cart = require("../models/cartModel")
 
 
+
+
+//@desc initialize cart
+//@route POST /hserver/order/
+//@access private
+const initializecart = asynchandler(async(req,res)=>{
+    Cart.findOneAndUpdate(
+        { user_id: req.user.user.id },
+        {$push: {
+            products:[],
+          }
+        },
+        { new: true, upsert: true }
+      ).exec((error, orders) => {
+        if (error) {
+            throw new Error(error)};
+        if (orders) {
+          res.status(201).json({ orders });
+        }
+      });
+
+})
+
+
 //@desc add to cart
 //@api POST hserver/medicine/cart
 //acess private
@@ -92,40 +116,7 @@ const getCart = asynchandler(async(req,res)=>{
 
 const removeCartItem = asynchandler(async(req, res)=>{
     const {productId} = req.body
-    // console.log(productId)
-    // console.log(qty)
-    // Cart.findOne({user_id: req.user.user.id}, (err, cart)=>{
-    //     if(err){
-    //         throw new Error(err)
-    //     }else{
-    //         if(productId && qty){
-    //             if(cart.products.length === 0){
-    //                 res.json({"mess":"Cart Empty"})
-    //             }
-    //         }else{
-    //             let itemIndex = cart.products.findIndex(p=>p.product == productId);
-
-    //             if(itemIndex === -1){
-    //                 res.json({"mess":"Invalid Product"});
-    //             }
-    //             else{
-    //                 if(cart.products[itemIndex].qty === qty){
-    //                     cart.products.splice(itemIndex,1);
-    //                 }
-    //                 else if(cart.products[itemIndex].qty > qty){
-    //                     cart.products[itemIndex].qty = cart.products.qty - qty;
-    //                 }else{
-    //                     res.json({"mess":"Enter lower Qty"})
-    //                 }
-
-    //                 cart.save((err, res)=>{
-    //                     if(err) throw new Error(err)
-    //                     res.json({"mess":"Cart Updated"})
-    //                 })
-    //             }
-    //         }
-    //     }
-    // })
+    
     //console.log(productId)
     if(productId){
         Cart.updateOne(
@@ -149,4 +140,4 @@ const removeCartItem = asynchandler(async(req, res)=>{
 
 
 
-module.exports =  {addtoCart,getCart,removeCartItem};
+module.exports =  {addtoCart,getCart,removeCartItem,initializecart};

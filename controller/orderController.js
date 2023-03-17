@@ -7,6 +7,32 @@ const cart = require("../models/cartModel")
 const async = require("async")
 const asynchandler = require("express-async-handler")
 
+//@desc initialize order
+//@route POST /hserver/order/
+//@access private
+const initializeOrder = asynchandler(async(req,res)=>{
+    
+    order.findOneAndUpdate(
+        { user_id: req.user.user.id },
+        {
+          $push: {
+            orders:[],
+          },
+        },
+        { new: true, upsert: true }
+      ).exec((error, orders) => {
+        if (error) {
+            throw new Error(error)};
+        if (orders) {
+          res.status(201).json({ orders });
+        }
+      });
+
+})
+
+
+
+
 //@desc create order
 //@route POST /hserver/order/
 //@access private
@@ -51,7 +77,7 @@ const createOrder = asynchandler(async(req,res)=>{
                   $push: {
                     orders:{
                         products: products,
-                        orderStatus:"pending",
+                        orderStatus:"Pending",
                         grandTotal: grandTotal,
                         shippingDetails:shippingDetails
                     },
@@ -135,4 +161,4 @@ const getOrders = asynchandler((req,res)=>{
     })
 })
  
-module.exports = {createOrder,updateOrder,getOrders}
+module.exports = {createOrder,updateOrder,getOrders,initializeOrder}

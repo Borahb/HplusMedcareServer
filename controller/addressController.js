@@ -2,6 +2,35 @@ const UserAddress = require("../models/addressModel")
 const asynchandler = require("express-async-handler")
 const async = require("async")
 
+//@desc initialize address
+//@route POST /hserver/order/initaddress
+//@access private
+const initializeaddress = asynchandler(async(req,res)=>{
+    
+  UserAddress.findOneAndUpdate(
+      { user_id: req.user.user.id },
+      {
+        $push: {
+          address:[],
+        },
+      },
+      { new: true, upsert: true }
+    ).exec((error, orders) => {
+      if (error) {
+          throw new Error(error)};
+      if (orders) {
+        res.status(201).json({ orders });
+      }
+    });
+
+})
+
+
+
+
+
+
+
 
 //@desc add address
 //@api POST hserver/user/address
@@ -63,4 +92,4 @@ const getAddress = asynchandler(async(req,res)=>{
         
     })
 
-module.exports = {addAddress,getAddress}
+module.exports = {addAddress,getAddress,initializeaddress}
