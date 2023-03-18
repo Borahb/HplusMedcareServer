@@ -26,12 +26,6 @@ const initializeaddress = asynchandler(async(req,res)=>{
 })
 
 
-
-
-
-
-
-
 //@desc add address
 //@api POST hserver/user/address
 //acess private
@@ -92,4 +86,30 @@ const getAddress = asynchandler(async(req,res)=>{
         
     })
 
-module.exports = {addAddress,getAddress,initializeaddress}
+//@desc delete address
+//@api DELETE hserver/user/address
+//acess private
+
+const removeAddress = asynchandler(async(req,res)=>{
+  const { payload } = req.body;
+  UserAddress.findOneAndUpdate(
+    { user_id: req.user.user.id },
+    {
+      $pull: {
+        address: {
+          "_id": payload.address._id 
+        },
+      },
+    },
+    { new: true, upsert: true }
+  ).exec((error, address) => {
+    if (error) return res.status(400).json({ error });
+    if (address) {
+      res.status(201).json({ address });
+    }
+  });
+  
+      
+  })
+
+module.exports = {addAddress,getAddress,initializeaddress,removeAddress}
