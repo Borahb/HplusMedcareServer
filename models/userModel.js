@@ -21,28 +21,7 @@ const userSchema = mongoose.Schema({
     },
     stripeCustomerID:{
         type:String,
-    },
-    street: {
-        type: String,
-        default: ''
-    },
-    apartment: {
-        type: String,
-        default: ''
-    },
-    zip :{
-        type: String,
-        default: ''
-    },
-    city: {
-        type: String,
-        default: ''
-    },
-    country: {
-        type: String,
-        default: ''
-    }
-    
+    } 
 },{
     timestamps:true
 })
