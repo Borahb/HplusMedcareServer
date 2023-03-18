@@ -77,7 +77,7 @@ const createOrder = asynchandler(async(req,res)=>{
                   $push: {
                     orders:{
                         products: products,
-                        orderStatus:"Pending",
+                        orderStatus:"Order in Progress",
                         grandTotal: grandTotal,
                         shippingDetails:shippingDetails
                     },
