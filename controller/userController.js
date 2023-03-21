@@ -59,6 +59,11 @@ const loginUser = asyncHandler(async(req,res)=>{
 
     const user = await User.findOne({email})
 
+    if(!user){
+        res.status(400)
+        throw new Error("User not registered")
+    }
+
     //compare password
     
     if(user && (await bcrypt.compare(password, user.password))){
@@ -78,7 +83,7 @@ const loginUser = asyncHandler(async(req,res)=>{
         res.status(200).json({token})
     }else{
         res.status(401)
-        throw new Error("Email or password not valid")
+        throw new Error("Password not valid")
     }
 
 })

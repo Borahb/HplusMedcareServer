@@ -40,10 +40,15 @@ const addtoCart = asynchandler(async(req,res)=>{
         throw new Error("UserId Required")
     }
 
-    Cart.findOneAndUpdate(
-        { user_id: req.user.user.id },
+    let productexist = await Cart.findOne({user_id: req.user.user.id, "products.product": products.product})
+
+    //console.log(productexist)
+
+    if(!productexist){
+      Cart.findOneAndUpdate(
+        {user_id: req.user.user.id,},
         {$push: {
-            products:products,
+            "products":products,
           }
         },
         { new: true, upsert: true }
@@ -55,7 +60,24 @@ const addtoCart = asynchandler(async(req,res)=>{
         }
       });
 
-    
+    }else{
+
+      Cart.findOneAndUpdate(
+        {user_id: req.user.user.id, "products.product": products.product},
+        {$set: {
+            "products.$":products,
+          }
+        },
+        { new: true, upsert: true }
+      ).exec((error, orders) => {
+        if (error) {
+            throw new Error(error)};
+        if (orders) {
+          res.status(201).json({ orders });
+        }
+      });
+    }
+
     
 })
 
