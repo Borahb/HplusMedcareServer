@@ -11,27 +11,26 @@ const validateToken = asyncHandler(async(req,res,next)=>{
     if(authHeader && authHeader.startsWith("Bearer")){
         token = authHeader.split(" ")[1]
         //res.json({token:token})
+        if(!token){
+            res.statusCode(401)
+            throw new Error("Token is missing")
+        }
+
         jwt.verify(token, process.env.ACCESS_TOKEN,(err,decoded)=>{
             if(err){
                 res.statusCode(401)
                 throw new Error("Token not valid")
             }
+
+            if(!decoded){
+            res.status(400)
+            throw new Error("User is not authorized")
+            }
+
             req.user = decoded
             //res.json({decoded})
             next()
-        })
-        //req.user = decoded
-        //res.json({decoded})
-        //next()
-        // if(!decoded){
-        //     res.status(400)
-        //     throw new Error("User is not authorized")
-        // }
-
-        if(!token){
-            res.statusCode(401)
-            throw new Error("User is not authorized or token is missing")
-        }
+        })     
     }
 })
 
