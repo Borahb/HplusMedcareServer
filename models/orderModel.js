@@ -77,6 +77,10 @@ const orderSchema = mongoose.Schema({
           type:String,
           required: true,
       },
+      date:{
+        type:String,
+        required: true
+      },
       transactionId:{
           type:String,
       }  

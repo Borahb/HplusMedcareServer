@@ -68,8 +68,14 @@ const createOrder = asynchandler(async(req,res)=>{
             
             grandTotal += (product.product.Price * product.qty)
             });
-            //console.log(model)
             //res.json({model})
+            let ts = Date.now();
+
+            let date_time = new Date(ts);
+            let date = date_time.getDate();
+            let month = date_time.getMonth() + 1;
+            let year = date_time.getFullYear();
+            let current_date = date + "-" + month + "-" + year
 
             order.findOneAndUpdate(
                 { user_id: req.user.user.id },
@@ -79,7 +85,8 @@ const createOrder = asynchandler(async(req,res)=>{
                         products: products,
                         orderStatus:"Order in Progress",
                         grandTotal: grandTotal,
-                        shippingDetails:shippingDetails
+                        shippingDetails:shippingDetails,
+                        date: current_date
                     },
                   },
                 },
