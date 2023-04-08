@@ -45,6 +45,7 @@ const addtoCart = asynchandler(async(req,res)=>{
     //console.log(productexist)
 
     if(!productexist){
+      
       Cart.findOneAndUpdate(
         {user_id: req.user.user.id,},
         {$push: {
