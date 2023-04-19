@@ -20,6 +20,7 @@ app.use("/hserver/medicine", require("./routes/medicineRoutes"))
 app.use("/hserver/auth", require("./routes/userRoutes"))
 app.use("/hserver/cart", require("./routes/cartRoutes"))
 app.use("/hserver/user", require("./routes/addressRoutes"))
+app.use("/hserver/user", require("./routes/uploadPrescripRoutes"))
 app.use("/hserver/order", require("./routes/orderRoutes"))
 app.all("*",(req,res)=>{res.status(404).json({"mess":"Invalid Route"})});
 //middleware
