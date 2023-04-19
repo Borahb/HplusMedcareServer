@@ -95,7 +95,13 @@ const createOrder = asynchandler(async(req,res)=>{
                 if (error) {
                     throw new Error(error)};
                 if (orders) {
-                  res.status(201).json({ orders });
+                    if (orders) {
+                        cart.updateOne({user_id: req.user.user.id},{ $set: {products: [] }}).exec((error,response)=>{
+                            if (error) {
+                                res.status(400)
+                                throw new Error(error)};
+                        })}
+                    res.status(201).json({ orders });
                 }
               });
 
