@@ -29,7 +29,7 @@ const validateToken = asyncHandler(async (req, res, next) => {
             }
 
             req.user = decoded
-            res.json(req.user.user.id)
+            //res.json(req.user.user)
             next()
         })
     }
