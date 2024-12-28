@@ -30,45 +30,60 @@ const initializeaddress = asynchandler(async(req,res)=>{
 //@api POST hserver/user/address
 //acess private
 
-const addAddress = asynchandler(async(req,res)=>{
-const { payload } = req.body;
-  if (payload.address) {
-    if (payload.address._id) {
-      UserAddress.findOneAndUpdate(
-        { user_id: req.user.user.id, "address._id": payload.address._id },
-        {
-          $set: {
-            "address.$": payload.address,
-          },
-        }
-      ).exec((error, address) => {
-        if (error) return res.status(400).json({ error });
-        if (address) {
-          res.status(201).json({ address });
-        }
-      });
-    } else {
-      UserAddress.findOneAndUpdate(
-        { user_id: req.user.user.id },
-        {
-          $push: {
-            address: payload.address,
-          },
-        },
-        { new: true, upsert: true }
-      ).exec((error, address) => {
-        if (error) return res.status(400).json({ error });
-        if (address) {
-          res.status(201).json({ address });
-        }
-      });
-    }
-  } else {
-    res.status(400).json({ error: "Params address required" });
+const addAddress = asynchandler(async (req, res) => {
+  const {
+    name,
+    mobileNumber,
+    pinCode,
+    locality,
+    address,
+    addressType,
+    _id,
+  } = req.body;
+
+  if (!name || !mobileNumber || !pinCode || !locality || !address || !addressType) {
+    return res.status(400).json({ error: "All address fields are required" });
   }
 
-    
-})
+  const newAddress = { name, mobileNumber, pinCode, locality, address, addressType };
+
+  if (_id) {
+    // Update an existing address
+    UserAddress.findOneAndUpdate(
+      { user_id: req.user.user.id, "address._id": _id },
+      {
+        $set: {
+          "address.$": newAddress,
+        },
+      },
+      { new: true }
+    ).exec((error, updatedAddress) => {
+      if (error) return res.status(400).json({ error });
+      if (updatedAddress) {
+        return res.status(200).json({ address: updatedAddress });
+      } else {
+        return res.status(404).json({ error: "Address not found" });
+      }
+    });
+  } else {
+    // Add a new address
+    UserAddress.findOneAndUpdate(
+      { user_id: req.user.user.id },
+      {
+        $push: {
+          address: newAddress,
+        },
+      },
+      { new: true, upsert: true }
+    ).exec((error, createdAddress) => {
+      if (error) return res.status(400).json({ error });
+      if (createdAddress) {
+        return res.status(201).json({ address: createdAddress });
+      }
+    });
+  }
+});
+
 
 
 //@desc get address
@@ -90,14 +105,19 @@ const getAddress = asynchandler(async(req,res)=>{
 //@api DELETE hserver/user/address
 //acess private
 
-const removeAddress = asynchandler(async(req,res)=>{
-  const { payload } = req.body;
+const removeAddress = asynchandler(async (req, res) => {
+  const { addressId } = req.query; // Extracting addressId from query parameters
+
+  if (!addressId) {
+    return res.status(400).json({ error: "Address ID is required" });
+  }
+
   UserAddress.findOneAndUpdate(
     { user_id: req.user.user.id },
     {
       $pull: {
         address: {
-          "_id": payload.address._id 
+          "_id": addressId,
         },
       },
     },
@@ -105,11 +125,12 @@ const removeAddress = asynchandler(async(req,res)=>{
   ).exec((error, address) => {
     if (error) return res.status(400).json({ error });
     if (address) {
-      res.status(201).json({ address });
+      res.status(200).json({ address });
+    } else {
+      res.status(404).json({ message: "Address not found" });
     }
   });
-  
-      
-  })
+});
+
 
 module.exports = {addAddress,getAddress,initializeaddress,removeAddress}
