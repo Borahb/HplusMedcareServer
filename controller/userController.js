@@ -93,6 +93,7 @@ const loginUser = asyncHandler(async(req,res)=>{
 //@access private
 
 const currentUser = asyncHandler(async(req,res)=>{
+    console.log('authroute')
     const user = await User.findOne({_id:req.user.user.id})
     res.status(200).json(user)
     //console.log(req.user.user.id)
