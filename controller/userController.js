@@ -77,7 +77,7 @@ const loginUser = asyncHandler(async (req, res) => {
         },
             process.env.ACCESS_TOKEN,
             {
-                expiresIn: "120m"
+                expiresIn: "100000000000m"
             }
         )
 
@@ -111,7 +111,7 @@ const refreshToken = asyncHandler(async (req, res) => {
             },
             process.env.ACCESS_TOKEN,
             {
-                expiresIn: "120m", // Token expiration set to 2 hours
+                expiresIn: "100000000000m",
             }
         );
 
